@@ -1,0 +1,104 @@
+import React, { useState, useEffect, useContext } from "react";
+import { NavLink, Outlet } from "react-router-dom";
+import AppContext from "../../context";
+import { initialStateUpdate } from "../../module";
+import { style } from "../../style";
+import logo from "../../assets/logo.png";
+
+const trimString = (string) => {
+  const stringStart = string.slice(0, 5);
+  const stringEnd = string.slice(38, 42);
+  return stringStart + "..." + stringEnd;
+};
+
+function Dapp() {
+  const [menuShown, setMenuShown] = useState(false);
+  const {
+    isConnected,
+    addConnection,
+    address,
+    addAddress,
+    addCollectionAmount,
+    addItemData,
+    addMintPrice,
+    addLastMintedId,
+  } = useContext(AppContext);
+
+  useEffect(() => {
+    const checkAccount = async () => {
+      const accounts = await window.ethereum.request({
+        method: "eth_accounts",
+      });
+      const account = accounts[0];
+      if (accounts.length > 0) {
+        initialStateUpdate(
+          account,
+          addConnection,
+          addAddress,
+          addCollectionAmount,
+          addItemData,
+          addMintPrice,
+          addLastMintedId
+        );
+      }
+    };
+    checkAccount();
+  }, []);
+
+  const connect = async () => {
+    if (typeof window.ethereum !== "undefined") {
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      const account = accounts[0];
+      initialStateUpdate(
+        account,
+        addConnection,
+        addAddress,
+        addCollectionAmount,
+        addItemData,
+        addMintPrice
+      );
+    } else {
+      console.log("no ethereum provider detected");
+      return;
+    }
+  };
+
+  return (
+    <div className="pl-72">
+      <div
+        className={`w-72 h-full top-1/2 -translate-y-1/2 ${
+          menuShown ? "left-0" : "-left-64"
+        } lg:left-0 border-r border-slate-300  py-12 px-2 text-center fixed ease-in-out duration-300 z-50`}
+      >
+        <img
+          className="w-1/5 lg:w-1/2 mx-auto my-0 mb-4 lg:mb-7"
+          src={logo}
+          alt=""
+        />
+        <button onClick={connect} className={style.btnUniversal}>
+          {isConnected ? "Account connected" : "Connect"}
+        </button>
+        {address && (
+          <p className="text-slate-500 text-xs italic mt-3">
+            {trimString(address)}
+          </p>
+        )}
+        <div className="mt-5 lg:mt-16 px-5">
+          <NavLink className={style.link} to="/app/collections">
+            Collections
+          </NavLink>
+          <NavLink className={style.link} to="/app/mint">
+            Mint
+          </NavLink>
+        </div>
+      </div>
+      <div className="p-16">
+        <Outlet />
+      </div>
+    </div>
+  );
+}
+
+export default Dapp;
