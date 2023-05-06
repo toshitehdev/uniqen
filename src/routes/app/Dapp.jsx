@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import AppContext from "../../context";
-import { initialStateUpdate } from "../../module";
+import {
+  updateCollections,
+  setAccountState,
+  getContractState,
+} from "../../module";
 import { style } from "../../style";
 import logo from "../../assets/logo.png";
 
@@ -24,6 +28,12 @@ function Dapp() {
     addLastMintedId,
   } = useContext(AppContext);
 
+  function updateData(acc) {
+    updateCollections(acc, addItemData, addCollectionAmount);
+    setAccountState(acc, addConnection, addAddress);
+    getContractState(addMintPrice, addLastMintedId);
+  }
+
   useEffect(() => {
     const checkAccount = async () => {
       const accounts = await window.ethereum.request({
@@ -31,15 +41,7 @@ function Dapp() {
       });
       const account = accounts[0];
       if (accounts.length > 0) {
-        initialStateUpdate(
-          account,
-          addConnection,
-          addAddress,
-          addCollectionAmount,
-          addItemData,
-          addMintPrice,
-          addLastMintedId
-        );
+        updateData(account);
       }
     };
     checkAccount();
@@ -51,14 +53,7 @@ function Dapp() {
         method: "eth_requestAccounts",
       });
       const account = accounts[0];
-      initialStateUpdate(
-        account,
-        addConnection,
-        addAddress,
-        addCollectionAmount,
-        addItemData,
-        addMintPrice
-      );
+      updateData(account);
     } else {
       console.log("no ethereum provider detected");
       return;

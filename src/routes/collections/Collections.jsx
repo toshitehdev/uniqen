@@ -5,19 +5,9 @@ import bgplc from "../../assets/bgplc.png";
 
 function Collections() {
   const [renderFrom, setRenderFrom] = useState(0);
-  const {
-    isConnected,
-    collectionAmount,
-    addressTransferSingle,
-    addAddressToTransfer,
-    addCollectionAmount,
-    itemData,
-    addItemData,
-    addOrdinalIdView,
-    mintPrice,
-    addMintPrice,
-  } = useContext(AppContext);
+  const { itemData } = useContext(AppContext);
   const step = window.innerWidth < 1030 ? 9 : 12;
+
   const collectionList = () => {
     let arr = [];
     for (let i = renderFrom; i < renderFrom + step; i++) {
