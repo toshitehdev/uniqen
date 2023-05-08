@@ -26,10 +26,12 @@ function Dapp() {
     addItemData,
     addMintPrice,
     addLastMintedId,
+    setLoading,
+    loading,
   } = useContext(AppContext);
 
-  function updateData(acc) {
-    updateCollections(acc, addItemData, addCollectionAmount);
+  async function updateData(acc) {
+    updateCollections(acc, addItemData, addCollectionAmount, setLoading);
     setAccountState(acc, addConnection, addAddress);
     getContractState(addMintPrice, addLastMintedId);
   }
@@ -89,9 +91,7 @@ function Dapp() {
           </NavLink>
         </div>
       </div>
-      <div className="p-16">
-        <Outlet />
-      </div>
+      <div className="p-16">{loading ? "Loading..." : <Outlet />}</div>
     </div>
   );
 }

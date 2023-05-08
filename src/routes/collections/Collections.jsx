@@ -1,11 +1,13 @@
 import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
+import { style } from "../../style";
 import AppContext from "../../context";
 import bgplc from "../../assets/bgplc.png";
 
 function Collections() {
   const [renderFrom, setRenderFrom] = useState(0);
-  const { itemData } = useContext(AppContext);
+  const [activeButton, setActiveButton] = useState(1);
+  const { itemData, collectionAmount } = useContext(AppContext);
   const step = window.innerWidth < 1030 ? 9 : 12;
 
   const collectionList = () => {
@@ -66,10 +68,40 @@ function Collections() {
     }
     return arr;
   };
+  const paginationButton = () => {
+    const buttonCount = Math.ceil(itemData.length / step);
+    let arr = [];
+    for (let i = 0; i < buttonCount; i++) {
+      arr.push(
+        <button
+          key={itemData[i].id}
+          onClick={() => {
+            loadMore(i + 1);
+            setActiveButton(i + 1);
+          }}
+          className={style.btnPagination(activeButton, i)}
+        >
+          {i + 1}
+        </button>
+      );
+    }
+    return arr;
+  };
+  const loadMore = (start) => {
+    setRenderFrom(start * step - step);
+  };
   return (
     <div>
+      <h1 className="mb-8 border-b border-slate-300 pb-3 text-slate-600">
+        Collections: <span className="font-bold">{collectionAmount}</span>
+      </h1>
       <div className="grid grid-cols-3 lg:grid-cols-6 gap-12 rounded-xl">
         {collectionList()}
+      </div>
+      <div className="flex  px-1 dir-rtl">
+        <div className="mt-7 overflow-x-auto custom-scroll flex mb-5 dir-ltr py-2">
+          {paginationButton()}
+        </div>
       </div>
     </div>
   );

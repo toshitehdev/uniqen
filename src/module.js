@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { axios } from "axios";
+import axios from "axios";
 import { contractAddress, contractABI } from "./constant";
 
 const srcProvider = new ethers.BrowserProvider(window.ethereum);
@@ -10,20 +10,58 @@ const srcContract = new ethers.Contract(
 );
 
 const server = "http://localhost:5000";
+async function fetchIPFS(tokenHoldings) {
+  let promises = [];
+  const itemData = [];
+  for (let i = 0; i < tokenHoldings.length; i++) {
+    promises.push(
+      `https://ipfs.io/ipfs/bafybeibqknpxt2dc2s3o5ulfsvqognymzzaot2xk6hkwonhq3qmyerljfe/${tokenHoldings[i]}.json`
+    );
+    itemData.push({ id: tokenHoldings[i] });
+  }
+  return Promise.all(
+    promises.map((res) => {
+      return fetch(res)
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => data);
+    })
+  )
+    .then((value) => {
+      value.map((item, index) => {
+        const str = item.image.slice(7);
+        const img = `https://ipfs.io/ipfs/${str}`;
+        itemData[index].img = img;
+      });
+    })
+    .then(() => {
+      function compareNumbers(a, b) {
+        return a.id - b.id;
+      }
+      itemData.sort(compareNumbers);
+      return itemData;
+    });
+}
 
 export const updateCollections = async (
   account,
   addItemData,
-  addCollectionAmount
+  addCollectionAmount,
+  setLoading
 ) => {
+  setLoading(true);
   try {
-    const itemData = await axios.post(`${server}/collections`, {
+    const tokenHoldings = await axios.post(`${server}/collections`, {
       account,
     });
+    const itemData = await fetchIPFS(tokenHoldings.data);
     addItemData(itemData);
     addCollectionAmount(itemData.length);
+    setLoading(false);
   } catch (error) {
     console.log(error);
+    setLoading(false);
   }
 };
 

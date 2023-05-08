@@ -13,6 +13,7 @@ export function AppProvider({ children }) {
   const [ordinalIdView, setOrdinalIdView] = useState(0);
   const [mintPrice, setMintPrice] = useState(0);
   const [lastMintedId, setLastMintedId] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const addConnection = (param) => {
     setIsConnected(param);
@@ -66,6 +67,8 @@ export function AppProvider({ children }) {
     mintPrice,
     lastMintedId,
     addLastMintedId,
+    loading,
+    setLoading,
   };
 
   return <AppContext.Provider value={param}>{children}</AppContext.Provider>;
