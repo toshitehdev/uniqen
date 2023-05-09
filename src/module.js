@@ -105,7 +105,7 @@ export const transferMany = async (recipient, ids) => {
     contractABI,
     signer
   );
-  const gas = 10000000000;
+
   const gasFee = await sdk.estimateGasFee(
     "Fantom",
     "Moonbeam",
@@ -117,10 +117,20 @@ export const transferMany = async (recipient, ids) => {
       showDetailedFees: true,
     }
   );
-  console.log(gasFee);
-  // const tx = await contractSigned.transferMany(recipient, ids, gas);
-  // const response = await srcProvider.getTransactionReceipt(tx.hash);
-  // await response.confirmations();
+  const gas = BigInt("3000000000000000000");
+  const relayerFee = gas + BigInt(gasFee.baseFee);
+  const feeFormatted = ethers.formatEther(relayerFee);
+  console.log(feeFormatted);
+  const tx = await contractSigned.transferMany(
+    recipient,
+    ids,
+    ethers.parseEther(feeFormatted),
+    {
+      value: ethers.parseEther(feeFormatted),
+    }
+  );
+  const response = await srcProvider.getTransactionReceipt(tx.hash);
+  await response.confirmations();
   //do state update
-  return gasFee;
+  return response;
 };
