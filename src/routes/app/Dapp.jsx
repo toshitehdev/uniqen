@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { NavLink, Outlet } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 import AppContext from "../../context";
 import {
   updateCollections,
@@ -92,6 +93,18 @@ function Dapp() {
         </div>
       </div>
       <div className="p-16">{loading ? "Loading..." : <Outlet />}</div>
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
     </div>
   );
 }

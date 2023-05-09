@@ -1,73 +1,26 @@
 import React, { useContext, useState } from "react";
-import { Link } from "react-router-dom";
+import CollectionList from "./CollectionList";
+
+import { transferMany, updateCollections } from "../../module";
 import { style } from "../../style";
 import AppContext from "../../context";
 import bgplc from "../../assets/bgplc.png";
+import SelectedToken from "./SelectedToken";
 
 function Collections() {
   const [renderFrom, setRenderFrom] = useState(0);
+  const [selectedItemData, setSelectedItemData] = useState([]);
   const [activeButton, setActiveButton] = useState(1);
-  const { itemData, collectionAmount } = useContext(AppContext);
+  const {
+    itemData,
+    collectionAmount,
+    account,
+    addItemData,
+    addCollectionAmount,
+  } = useContext(AppContext);
+  const [addressTransferMany, setAddressTransferMany] = useState(null);
   const step = window.innerWidth < 1030 ? 9 : 12;
 
-  const collectionList = () => {
-    let arr = [];
-    for (let i = renderFrom; i < renderFrom + step; i++) {
-      if (!itemData[i]) {
-        arr.push(
-          <div
-            key={`sdf${i}`}
-            className="invisible rounded-2xl overflow-hidden relative"
-          >
-            <input type="checkbox" className="absolute top-5 right-5" />
-            <Link to="/app/ordinal" className="block">
-              <div className="relative">
-                <img src={bgplc} alt="" loading="lazy" />
-              </div>
-
-              <div className="bg-orange-400 px-5 py-5">
-                <p className="font-bold text-slate-700">#{0}</p>
-              </div>
-            </Link>
-          </div>
-        );
-      } else {
-        arr.push(
-          <div
-            key={itemData[i].id}
-            className=" rounded-2xl overflow-hidden relative"
-          >
-            <input
-              // onChange={(e) => handleSelection(e, itemData[i])}
-              type="checkbox"
-              className="absolute top-1 right-2 z-10"
-              // checked={selectedItemData.includes(itemData[i])}
-            />
-            <Link
-              // onClick={() => addOrdinalIdView(itemData[i].id)}
-              to="/dapp/ordinal"
-              className="block"
-            >
-              {/* <div className="bg-[#7f84a8] w-[133px] h-[133px] 2xl:w-[148px] 2xl:h-[148px]"> */}
-              <div className="relative">
-                <img src={bgplc} alt="" loading="lazy" />
-                <img
-                  className="min-w-full absolute top-0 left-0"
-                  src={itemData[i].img}
-                  loading="lazy"
-                />
-              </div>
-
-              <div className="bg-yellow-500 px-5 py-5">
-                <p className="font-bold text-slate-700">#{itemData[i].id}</p>
-              </div>
-            </Link>
-          </div>
-        );
-      }
-    }
-    return arr;
-  };
   const paginationButton = () => {
     const buttonCount = Math.ceil(itemData.length / step);
     let arr = [];
@@ -90,18 +43,64 @@ function Collections() {
   const loadMore = (start) => {
     setRenderFrom(start * step - step);
   };
+  const handleTransferMany = () => {
+    if (selectedItemData.length < 1) {
+      return;
+    }
+    if (!addressTransferMany) {
+      return;
+    }
+    const idToSend = selectedItemData.map((item) => item.id);
+    transferMany(addressTransferMany, idToSend).then(() => {
+      updateCollections(account, addItemData, addCollectionAmount).then(() => {
+        setSelectedItemData([]);
+        toast.success("Successfully Transfered!");
+      });
+    });
+  };
   return (
     <div>
       <h1 className="mb-8 border-b border-slate-300 pb-3 text-slate-600">
         Collections: <span className="font-bold">{collectionAmount}</span>
       </h1>
       <div className="grid grid-cols-3 lg:grid-cols-6 gap-12 rounded-xl">
-        {collectionList()}
+        <CollectionList
+          renderFrom={renderFrom}
+          step={step}
+          bgplc={bgplc}
+          itemData={itemData}
+          selectedItemData={selectedItemData}
+          setSelectedItemData={setSelectedItemData}
+        />
       </div>
       <div className="flex  px-1 dir-rtl">
         <div className="mt-7 overflow-x-auto custom-scroll flex mb-5 dir-ltr py-2">
           {paginationButton()}
         </div>
+      </div>
+      <h1 className="mb-3 mt-5">Selected Items:</h1>
+      <div className="grid grid-cols-4 lg:grid-cols-10 gap-2 border border-gray-700 p-4 lg:p-8 mb-2">
+        <SelectedToken
+          selectedItemData={selectedItemData}
+          setSelectedItemData={setSelectedItemData}
+        />
+      </div>
+      <button
+        className="mb-8 text-sm bg-rose-500 text-white px-4 py-2"
+        onClick={() => setSelectedItemData([])}
+      >
+        Cancel All
+      </button>
+      <div>
+        <input
+          type="text"
+          placeholder="Transfer to"
+          className="lg:mb-0 mb-3 w-full lg:w-96 px-6 py-2 mr-4 border border-teal-500"
+          onChange={(e) => setAddressTransferMany(e.target.value)}
+        />
+        <button onClick={handleTransferMany} className={style.btnUniversal}>
+          Transfer
+        </button>
       </div>
     </div>
   );

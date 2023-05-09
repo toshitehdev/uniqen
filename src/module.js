@@ -1,6 +1,11 @@
 import { ethers } from "ethers";
 import axios from "axios";
 import { contractAddress, contractABI } from "./constant";
+import { AxelarQueryAPI } from "@axelar-network/axelarjs-sdk";
+
+const sdk = new AxelarQueryAPI({
+  environment: "testnet",
+});
 
 const srcProvider = new ethers.BrowserProvider(window.ethereum);
 const srcContract = new ethers.Contract(
@@ -91,4 +96,31 @@ export const getContractState = async (addMintPrice, addLastMintedId) => {
   } catch (error) {
     console.log(error);
   }
+};
+
+export const transferMany = async (recipient, ids) => {
+  const signer = await srcProvider.getSigner();
+  const contractSigned = new ethers.Contract(
+    contractAddress,
+    contractABI,
+    signer
+  );
+  const gas = 10000000000;
+  const gasFee = await sdk.estimateGasFee(
+    "Fantom",
+    "Moonbeam",
+    "FTM",
+    undefined,
+    undefined,
+    undefined,
+    {
+      showDetailedFees: true,
+    }
+  );
+  console.log(gasFee);
+  // const tx = await contractSigned.transferMany(recipient, ids, gas);
+  // const response = await srcProvider.getTransactionReceipt(tx.hash);
+  // await response.confirmations();
+  //do state update
+  return gasFee;
 };
