@@ -1,4 +1,6 @@
 import React, { useContext, useState } from "react";
+import axios from "axios";
+
 import CollectionList from "./CollectionList";
 
 import { transferMany, updateCollections } from "../../module";
@@ -9,12 +11,14 @@ import SelectedToken from "./SelectedToken";
 
 function Collections() {
   const [renderFrom, setRenderFrom] = useState(0);
+  const [verified, setVerified] = useState(false);
+  const [signature, setSignature] = useState(null);
   const [selectedItemData, setSelectedItemData] = useState([]);
   const [activeButton, setActiveButton] = useState(1);
   const {
     itemData,
     collectionAmount,
-    account,
+    address,
     addItemData,
     addCollectionAmount,
   } = useContext(AppContext);
@@ -58,6 +62,21 @@ function Collections() {
       });
     });
   };
+  const verifyOwnership = async () => {
+    if (selectedItemData.length < 1) {
+      return;
+    }
+    try {
+      const signature = await axios.post("http://localhost:5000/verify", {
+        account: address,
+        ids: selectedItemData.map((token) => token.id),
+      });
+      setSignature(signature.data);
+      setVerified(true);
+    } catch (error) {
+      setVerified(false);
+    }
+  };
   return (
     <div>
       <h1 className="mb-8 border-b border-slate-300 pb-3 text-slate-600">
@@ -98,10 +117,26 @@ function Collections() {
           className="lg:mb-0 mb-3 w-full lg:w-96 px-6 py-2 mr-4 border border-teal-500"
           onChange={(e) => setAddressTransferMany(e.target.value)}
         />
-        <button onClick={handleTransferMany} className={style.btnUniversal}>
+        <button
+          onClick={verifyOwnership}
+          disabled={verified ? true : false}
+          className={style.btnVerify + " mr-2"}
+        >
+          {verified ? "Verified" : "Verify"}
+        </button>
+        <button
+          disabled={verified ? false : true}
+          onClick={handleTransferMany}
+          className={style.btnUniversal}
+        >
           Transfer
         </button>
       </div>
+      {!verified && (
+        <p className="text-sm mt-2 text-slate-500">
+          Verify the ownership first
+        </p>
+      )}
     </div>
   );
 }

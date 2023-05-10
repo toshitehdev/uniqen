@@ -11,7 +11,7 @@ function SelectedToken({ selectedItemData, setSelectedItemData }) {
         <div className="w-8 lg:w-16 relative" key={item.id}>
           <div
             onClick={() => cancelSingleSelected(item.id)}
-            className="absolute hover:bg-red-600 top-0 border border-white right-0 w-7 h-7 bg-custom-transparent rounded-full flex items-center justify-center text-white font-bold text-base cursor-pointer"
+            className="absolute bg-rose-500 hover:bg-red-600 top-0 border border-white right-0 w-7 h-7 bg-custom-transparent rounded-full flex items-center justify-center text-white font-bold text-base cursor-pointer"
           >
             X
           </div>

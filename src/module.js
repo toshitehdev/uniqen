@@ -118,9 +118,8 @@ export const transferMany = async (recipient, ids) => {
     }
   );
   const gas = BigInt("3000000000000000000");
-  const relayerFee = gas + BigInt(gasFee.baseFee);
-  const feeFormatted = ethers.formatEther(relayerFee);
-  console.log(feeFormatted);
+  const interChainFee = gas + BigInt(gasFee.baseFee);
+  const feeFormatted = ethers.formatEther(interChainFee);
   const tx = await contractSigned.transferMany(
     recipient,
     ids,
