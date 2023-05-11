@@ -1,10 +1,17 @@
 import { ethers } from "ethers";
 import axios from "axios";
 import { contractAddress, contractABI } from "./constant";
-import { AxelarQueryAPI } from "@axelar-network/axelarjs-sdk";
+import {
+  AxelarQueryAPI,
+  AxelarGMPRecoveryAPI,
+  Environment,
+} from "@axelar-network/axelarjs-sdk";
 
 const sdk = new AxelarQueryAPI({
   environment: "testnet",
+});
+const sdkStatus = new AxelarGMPRecoveryAPI({
+  environment: Environment.TESTNET,
 });
 
 const srcProvider = new ethers.BrowserProvider(window.ethereum);
@@ -117,7 +124,7 @@ export const transferMany = async (recipient, ids) => {
       showDetailedFees: true,
     }
   );
-  const gas = BigInt("3000000000000000000");
+  const gas = BigInt("10000000000000000") * BigInt(`${ids.length}`);
   const interChainFee = gas + BigInt(gasFee.baseFee);
   const feeFormatted = ethers.formatEther(interChainFee);
   const tx = await contractSigned.transferMany(
@@ -129,7 +136,49 @@ export const transferMany = async (recipient, ids) => {
     }
   );
   const response = await srcProvider.getTransactionReceipt(tx.hash);
-  await response.confirmations();
+  const txStatus = await sdkStatus.queryTransactionStatus(tx.hash);
+  const interChainTx = txStatus.callTx.transactionHash;
+  // await response.confirmations();
   //do state update
-  return response;
+  return interChainTx;
+};
+
+export const mint = async (amount) => {
+  const signer = await srcProvider.getSigner();
+  const contractSigned = new ethers.Contract(
+    contractAddress,
+    contractABI,
+    signer
+  );
+  const getPrice = await srcContract.mint_price();
+  const priceToPay = ethers.toBigInt(getPrice) * ethers.toBigInt(amount);
+
+  const gasFee = await sdk.estimateGasFee(
+    "Fantom",
+    "Moonbeam",
+    "FTM",
+    undefined,
+    undefined,
+    undefined,
+    {
+      showDetailedFees: true,
+    }
+  );
+  const gas = BigInt("10000000000000000") * BigInt(`${amount}`);
+
+  const interChainFee = gas + BigInt(gasFee.baseFee);
+  const feeAll = ethers.formatEther(priceToPay + interChainFee);
+
+  const tx = await contractSigned.mintMany(
+    amount,
+    ethers.parseEther(ethers.formatEther(interChainFee)),
+    [0],
+    {
+      value: ethers.parseEther(feeAll),
+    }
+  );
+  const response = await srcProvider.getTransactionReceipt(tx.hash);
+  const txStatus = await sdkStatus.queryTransactionStatus(tx.hash);
+  const interChainTx = txStatus.callTx.transactionHash;
+  return interChainTx;
 };

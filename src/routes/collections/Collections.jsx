@@ -1,7 +1,13 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 
 import CollectionList from "./CollectionList";
+const trimString = (string) => {
+  const stringStart = string.slice(0, 5);
+  const stringEnd = string.slice(61, 66);
+  return stringStart + "..." + stringEnd;
+};
 
 import { transferMany, updateCollections } from "../../module";
 import { style } from "../../style";
@@ -15,14 +21,19 @@ function Collections() {
   const [signature, setSignature] = useState(null);
   const [selectedItemData, setSelectedItemData] = useState([]);
   const [activeButton, setActiveButton] = useState(1);
+  const [addressTransferMany, setAddressTransferMany] = useState(null);
+  const [loadingTransfer, setLoadingTransfer] = useState(false);
+  const [loadingVerify, setLoadingVerify] = useState(false);
+  const [interTx, setInterTx] = useState("");
   const {
     itemData,
     collectionAmount,
     address,
     addItemData,
     addCollectionAmount,
+    setLoading,
   } = useContext(AppContext);
-  const [addressTransferMany, setAddressTransferMany] = useState(null);
+
   const step = window.innerWidth < 1030 ? 9 : 12;
 
   const paginationButton = () => {
@@ -47,25 +58,36 @@ function Collections() {
   const loadMore = (start) => {
     setRenderFrom(start * step - step);
   };
-  const handleTransferMany = () => {
-    if (selectedItemData.length < 1) {
-      return;
-    }
-    if (!addressTransferMany) {
+  const handleTransferMany = async () => {
+    if (selectedItemData.length < 1 || !addressTransferMany || !signature) {
       return;
     }
     const idToSend = selectedItemData.map((item) => item.id);
-    transferMany(addressTransferMany, idToSend).then(() => {
-      updateCollections(account, addItemData, addCollectionAmount).then(() => {
-        setSelectedItemData([]);
-        toast.success("Successfully Transfered!");
+    let newItemData = itemData;
+    itemData.forEach(() => {
+      selectedItemData.forEach((token) => {
+        newItemData = newItemData.filter((i) => i.id !== token.id);
       });
     });
+    setLoadingTransfer(true);
+    try {
+      const interChainTx = await transferMany(addressTransferMany, idToSend);
+      addItemData(newItemData);
+      setSignature(null);
+      setVerified(false);
+      setAddressTransferMany(null);
+      setSelectedItemData([]);
+      setLoadingTransfer(false);
+      setInterTx(interChainTx);
+    } catch (error) {
+      setLoadingTransfer(false);
+    }
   };
   const verifyOwnership = async () => {
     if (selectedItemData.length < 1) {
       return;
     }
+    setLoadingVerify(true);
     try {
       const signature = await axios.post("http://localhost:5000/verify", {
         account: address,
@@ -73,15 +95,29 @@ function Collections() {
       });
       setSignature(signature.data);
       setVerified(true);
+      setLoadingVerify(false);
     } catch (error) {
       setVerified(false);
+      setLoadingVerify(false);
     }
   };
   return (
     <div>
-      <h1 className="mb-8 border-b border-slate-300 pb-3 text-slate-600">
-        Collections: <span className="font-bold">{collectionAmount}</span>
-      </h1>
+      <div className="mb-8 border-b border-slate-300 pb-3 flex justify-between">
+        <h1 className=" text-slate-600">
+          Collections: <span className="font-bold">{collectionAmount}</span>
+        </h1>
+        {interTx && (
+          <Link
+            className="text-blue-400"
+            to={`https://testnet.axelarscan.io/gmp/${interTx}`}
+            target="_blank"
+          >
+            Interchain Transfer TX: {trimString(interTx)}
+          </Link>
+        )}
+      </div>
+
       <div className="grid grid-cols-3 lg:grid-cols-6 gap-12 rounded-xl">
         <CollectionList
           renderFrom={renderFrom}
@@ -120,23 +156,22 @@ function Collections() {
         <button
           onClick={verifyOwnership}
           disabled={verified ? true : false}
-          className={style.btnVerify + " mr-2"}
+          className={style.btnVerify + " mr-2 h-full"}
         >
-          {verified ? "Verified" : "Verify"}
+          {loadingVerify ? "Verifying..." : "Verify"}
         </button>
         <button
           disabled={verified ? false : true}
           onClick={handleTransferMany}
-          className={style.btnUniversal}
+          className={`${style.btnUniversal}`}
         >
-          Transfer
+          {loadingTransfer ? "Transferring..." : "Transfer"}
         </button>
       </div>
-      {!verified && (
-        <p className="text-sm mt-2 text-slate-500">
-          Verify the ownership first
-        </p>
-      )}
+
+      <p className="text-sm mt-2 text-slate-500">
+        {verified ? "Ownership Verified!" : "Verify the ownership first"}
+      </p>
     </div>
   );
 }
