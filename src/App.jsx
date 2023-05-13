@@ -8,6 +8,7 @@ import Home from "./routes/home/Home";
 import Dapp from "./routes/app/Dapp";
 import Collections from "./routes/collections/Collections";
 import Mint from "./routes/mint/Mint";
+import Attributes from "./routes/attributes/Attributes";
 
 function App() {
   return (
@@ -19,6 +20,9 @@ function App() {
             <Route index element={<Navigate to="/app/collections" />} />
             <Route path="/app/collections" element={<Collections />} />
             <Route path="/app/mint" element={<Mint />} />
+            <Route path="/app/attributes" element={<Attributes />}>
+              <Route path="/app/attributes/:id" element={<Attributes />} />
+            </Route>
           </Route>
         </Routes>
       </AppProvider>

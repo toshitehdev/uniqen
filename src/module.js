@@ -52,6 +52,7 @@ async function fetchIPFS(tokenHoldings) {
         return a.id - b.id;
       }
       itemData.sort(compareNumbers);
+      // console.log(itemData);
       return itemData;
     });
 }

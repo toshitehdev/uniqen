@@ -26,7 +26,7 @@ function CollectionList({
         arr.push(
           <div key={`sdf${i}`} className="invisible overflow-hidden relative">
             <input type="checkbox" className="absolute top-5 right-5" />
-            <Link to="/app/ordinal" className="block">
+            <Link to="/app/attributes" className="block">
               <div className="relative">
                 <img src={bgplc} alt="" loading="lazy" />
               </div>
@@ -47,8 +47,8 @@ function CollectionList({
               checked={selectedItemData.includes(itemData[i])}
             />
             <Link
-              onClick={() => addOrdinalIdView(itemData[i].id)}
-              to="/dapp/ordinal"
+              // onClick={() => addOrdinalIdView(itemData[i].id)}
+              to={`/app/attributes/${itemData[i].id}`}
               className="block"
             >
               <div className="relative">

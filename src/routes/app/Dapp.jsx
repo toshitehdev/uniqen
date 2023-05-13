@@ -90,6 +90,9 @@ function Dapp() {
           <NavLink className={style.link} to="/app/mint">
             Mint
           </NavLink>
+          <NavLink className={style.link} to="/app/attributes">
+            Attributes
+          </NavLink>
         </div>
       </div>
       <div className="p-16">{loading ? "Loading..." : <Outlet />}</div>
