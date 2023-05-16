@@ -22,7 +22,6 @@ function Attributes() {
       setTokenData(call.data);
       setImg(imgUrl);
       setAttributes(call.data.attributes);
-      console.log(call.data);
     }
     fetchToken();
   }, [id]);

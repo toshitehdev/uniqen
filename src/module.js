@@ -106,18 +106,19 @@ export const getContractState = async (addMintPrice, addLastMintedId) => {
   }
 };
 
-export const transferMany = async (recipient, ids) => {
+export const transferMany = async (recipient, ids, signature) => {
   const signer = await srcProvider.getSigner();
   const contractSigned = new ethers.Contract(
     contractAddress,
     contractABI,
     signer
   );
+  console.log(signature, ids);
 
   const gasFee = await sdk.estimateGasFee(
-    "Fantom",
+    "Avalanche",
     "Moonbeam",
-    "FTM",
+    "AVAX",
     undefined,
     undefined,
     undefined,
@@ -132,6 +133,7 @@ export const transferMany = async (recipient, ids) => {
     recipient,
     ids,
     ethers.parseEther(feeFormatted),
+    signature,
     {
       value: ethers.parseEther(feeFormatted),
     }
@@ -155,9 +157,9 @@ export const mint = async (amount) => {
   const priceToPay = ethers.toBigInt(getPrice) * ethers.toBigInt(amount);
 
   const gasFee = await sdk.estimateGasFee(
-    "Fantom",
+    "Avlanche",
     "Moonbeam",
-    "FTM",
+    "Avax",
     undefined,
     undefined,
     undefined,

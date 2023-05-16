@@ -71,7 +71,11 @@ function Collections() {
     });
     setLoadingTransfer(true);
     try {
-      const interChainTx = await transferMany(addressTransferMany, idToSend);
+      const interChainTx = await transferMany(
+        addressTransferMany,
+        idToSend,
+        signature
+      );
       addItemData(newItemData);
       setSignature(null);
       setVerified(false);
@@ -81,6 +85,7 @@ function Collections() {
       setInterTx(interChainTx);
     } catch (error) {
       setLoadingTransfer(false);
+      console.log(error);
     }
   };
   const verifyOwnership = async () => {
@@ -97,6 +102,7 @@ function Collections() {
       setVerified(true);
       setLoadingVerify(false);
     } catch (error) {
+      console.log(error);
       setVerified(false);
       setLoadingVerify(false);
     }
