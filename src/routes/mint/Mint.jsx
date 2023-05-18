@@ -28,6 +28,7 @@ function Mint() {
       setAmount(0);
       setInterTx(interChainTx);
     } catch (error) {
+      console.log(error);
       setLoadingMint(false);
       setAmount(0);
     }

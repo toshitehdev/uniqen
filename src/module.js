@@ -113,7 +113,7 @@ export const transferMany = async (recipient, ids, signature) => {
     contractABI,
     signer
   );
-  console.log(signature, ids);
+  // console.log(signature, ids);
 
   const gasFee = await sdk.estimateGasFee(
     "Avalanche",
@@ -141,8 +141,6 @@ export const transferMany = async (recipient, ids, signature) => {
   const response = await srcProvider.getTransactionReceipt(tx.hash);
   const txStatus = await sdkStatus.queryTransactionStatus(tx.hash);
   const interChainTx = txStatus.callTx.transactionHash;
-  // await response.confirmations();
-  //do state update
   return interChainTx;
 };
 
@@ -157,9 +155,9 @@ export const mint = async (amount) => {
   const priceToPay = ethers.toBigInt(getPrice) * ethers.toBigInt(amount);
 
   const gasFee = await sdk.estimateGasFee(
-    "Avlanche",
+    "Avalanche",
     "Moonbeam",
-    "Avax",
+    "AVAX",
     undefined,
     undefined,
     undefined,

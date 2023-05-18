@@ -1,4 +1,4 @@
-export const contractAddress = "0x20382A7E5831d4B55095c8521A63C496E9A5b2F8";
+export const contractAddress = "0xcBD57772692a0373B9c2296e51d67808A73872B2";
 
 export const contractABI = [
   {
@@ -556,40 +556,6 @@ export const contractABI = [
       },
     ],
     stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_to",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "_amount",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256[]",
-        name: "_message",
-        type: "uint256[]",
-      },
-      {
-        internalType: "bytes",
-        name: "signature",
-        type: "bytes",
-      },
-    ],
-    name: "verify",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
-    ],
-    stateMutability: "pure",
     type: "function",
   },
 ];
