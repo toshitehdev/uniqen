@@ -19,3 +19,12 @@ To start, run the following:
 ```
 yarn dev
 ```
+
+## Backend Server Repo
+
+https://github.com/toshitehdev/uniqen-backend
+
+## Contracts:
+
+Source Chain (Avalanche Fuji): 0x6b554477456062C280675aE58Ed8Ca42A4765E19
+Destination Chain (Moonbase Alpha): 0xdff793fF6E0acB7036cAA8eFb029c82117500Ac1

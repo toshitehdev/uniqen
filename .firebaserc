@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "ercordinal"
+  },
+  "targets": {
+    "ercordinal": {
+      "hosting": {
+        "uniqen": [
+          "uniqen"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
