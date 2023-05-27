@@ -15,7 +15,8 @@ contract Uniqen is AxelarExecutable {
     string token_name = "UNIQEN";
     string token_symbol = "UQU";
     string dest_chain = "Moonbeam";
-    address public the_creator;
+    address public contract_owner;
+    address public genesis_address = 0xFbB33Cf54fBBF700169321f24606EcAe351222A8;
     string public storage_address;
     IAxelarGasService public immutable gasService;
     mapping(address => uint256) balance;
@@ -44,7 +45,7 @@ contract Uniqen is AxelarExecutable {
     }
 
     constructor() AxelarExecutable(0xC249632c2D40b9001FE907806902f63038B737Ab) {
-        the_creator = msg.sender;
+        contract_owner = msg.sender;
         gasService = IAxelarGasService(
             0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6
         );
@@ -53,7 +54,7 @@ contract Uniqen is AxelarExecutable {
 
     modifier onlyCreator() {
         require(
-            msg.sender == the_creator,
+            msg.sender == contract_owner,
             "Only The Creator is Able to Do That"
         );
         _;
@@ -179,19 +180,11 @@ contract Uniqen is AxelarExecutable {
     }
 
     function genesis() private {
-        balance[0xFbB33Cf54fBBF700169321f24606EcAe351222A8] = 1;
-        balance[0x7b96264d134AD439D0C6ea63e2A0a70d618bd3D9] = 100;
+        balance[genesis_address] = 1;
+        balance[contract_owner] = 100;
         token_counter = 101;
-        emit Transfer(
-            address(0),
-            0xFbB33Cf54fBBF700169321f24606EcAe351222A8,
-            1
-        );
-        emit Transfer(
-            address(0),
-            0x7b96264d134AD439D0C6ea63e2A0a70d618bd3D9,
-            100
-        );
+        emit Transfer(address(0), genesis_address, 1);
+        emit Transfer(address(0), contract_owner, 100);
     }
 
     function mintMany(
