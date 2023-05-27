@@ -29,4 +29,7 @@ https://github.com/toshitehdev/uniqen-backend
 https://github.com/toshitehdev/uniqen/tree/main/contracts
 
 Source Chain (Avalanche Fuji): 0x6b554477456062C280675aE58Ed8Ca42A4765E19
+https://testnet.snowtrace.io/address/0x6b554477456062c280675ae58ed8ca42a4765e19#code
+
 Destination Chain (Moonbase Alpha): 0xdff793fF6E0acB7036cAA8eFb029c82117500Ac1
+https://moonbase.moonscan.io/address/0xdff793fF6E0acB7036cAA8eFb029c82117500Ac1#code
