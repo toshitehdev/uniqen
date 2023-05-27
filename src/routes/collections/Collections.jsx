@@ -94,7 +94,7 @@ function Collections() {
     }
     setLoadingVerify(true);
     try {
-      const signature = await axios.post("http://localhost:5000/verify", {
+      const signature = await axios.post("https://ercordinal.xyz/verify", {
         account: address,
         ids: selectedItemData.map((token) => token.id),
       });
