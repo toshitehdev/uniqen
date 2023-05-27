@@ -21,7 +21,7 @@ const srcContract = new ethers.Contract(
   srcProvider
 );
 
-const server = "http://ercordinal.xyz";
+const server = "https://ercordinal.xyz";
 async function fetchIPFS(tokenHoldings) {
   let promises = [];
   const itemData = [];
